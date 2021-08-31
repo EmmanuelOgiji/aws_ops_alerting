@@ -5,4 +5,3 @@ This diagram demonstrates the intended architecture
 
 ![Alerting Architecture](Alerting.png)
 
-

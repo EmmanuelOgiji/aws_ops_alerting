@@ -18,4 +18,3 @@ def lambda_handler(event, context):
         if handler.is_event_as_expected(event):
             message = handler.build_message_string(event)
 
-

@@ -88,11 +88,12 @@ class TestAlertingMessageBuilders(TestCase):
         self.gd_event = {
             "severity": 3,
             "Finding_ID": "testId",
-            "eventFirstSeen": "",
-            "eventLastSeen": "",
+            "eventFirstSeen": "2017-01-12T16:30:42.236+0000",
+            "eventLastSeen": "2017-01-13T16:30:42.236+0000",
             "Finding_Type": "UnauthorizedAccess:EC2/TorIPCaller",
             "region": "eu-west-1",
-            "Finding_description": "This finding informs you that an EC2 instance in your AWS environment is receiving inbound connections from a Tor exit node."
+            "Finding_description": "This finding informs you that an EC2 instance in your AWS environment is receiving inbound connections from a Tor exit node.",
+            "Account_Id": "000000000000"
         }
 
     def test_cw_alarm_message(self):
@@ -114,6 +115,28 @@ State change time: 2017-01-12T16:30:42.236+0000
 
         cwa_handler = CloudWatchAlarmHandler()
         actual = cwa_handler.build_message_string(self.cw_alarm_event)
+
+        self.assertEqual(expected.strip(), actual)
+
+    def test_gd_findings_message(self):
+        expected = """
+There has been a Guardduty finding in AWS Account: 000000000000 in the eu-west-1 region
+
+Details of the Finding are as follows:
+
+Finding Type: UnauthorizedAccess:EC2/TorIPCaller
+
+Finding Description: This finding informs you that an EC2 instance in your AWS environment is receiving inbound connections from a Tor exit node.
+
+Finding Id: testId
+
+Event First Seen: 2017-01-12T16:30:42.236+0000
+
+Event Last Seen: 2017-01-13T16:30:42.236+0000
+"""
+
+        gd_handler = GuarddutyFindingHandler()
+        actual = gd_handler.build_message_string(self.gd_event)
 
         self.assertEqual(expected.strip(), actual)
 

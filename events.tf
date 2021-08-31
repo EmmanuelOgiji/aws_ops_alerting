@@ -38,7 +38,8 @@ resource "aws_cloudwatch_event_target" "guarduty_findings" {
     "eventLastSeen": <last_seen>,
     "Finding_Type": <finding_type>,
     "region": <region>,
-    "Finding_description": <description>
+    "Finding_description": <description>,
+    "Account_Id": "${data.aws_caller_identity.current.account_id}"
 }
 EOF
   }

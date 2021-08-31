@@ -27,3 +27,9 @@ variable "teams_webhook" {
   description = "The webhook to pass alerts to Microsoft Teams"
   default     = ""
 }
+
+variable "email_recipients" {
+  type        = string
+  description = "String comma separated list of emails to receive SES mails"
+  default     = ""
+}

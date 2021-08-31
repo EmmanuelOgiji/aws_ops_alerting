@@ -1,2 +1,8 @@
 # aws_ops_alerting
-Showing how simple Operations Alerting for an AWS account 
+This repo is a brief demo of how simple alerting can be setup for AWS Accounts to help with Security
+
+This diagram demonstrates the intended architecture
+
+![Alerting Architecture](Alerting.png)
+
+

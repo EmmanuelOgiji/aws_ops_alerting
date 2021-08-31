@@ -2,48 +2,29 @@ resource "aws_cloudwatch_log_group" "cloudtrail_logs" {
   name = "cloudtrail-logs"
 }
 
-resource "aws_cloudwatch_event_rule" "guarduty_findings" {
-  name        = "guardduty-events"
-  description = "GuardDutyEvent"
+resource "aws_cloudwatch_log_metric_filter" "console_sign_in_no_mfa" {
+  name           = "ConsoleSignInWithoutMfa"
+  pattern        = "{ $.eventName = ConsoleLogin && $.additionalEventData.MFAUsed = \"No\" }"
+  log_group_name = aws_cloudwatch_log_group.cloudtrail_logs.name
 
-  event_pattern = <<PATTERN
-{
-  "source": [
-    "aws.guardduty"
-  ],
-  "detail-type": [
-    "GuardDuty Finding"
-  ]
-}
-PATTERN
-}
-
-resource "aws_cloudwatch_event_target" "guarduty_findings" {
-  rule      = aws_cloudwatch_event_rule.guarduty_findings.name
-  target_id = "SendToSNS"
-  arn       = aws_sns_topic.ops_topic.arn
-  input_transformer {
-    input_paths = {
-      severity     = "$.detail.severity",
-      finding_type = "$.detail.type",
-      region       = "$.region",
-      description  = "$.detail.description",
-      first_seen   = "$.detail.service.eventFirstSeen",
-      last_seen    = "$.detail.service.eventLastSeen",
-      id           = "$.detail.id"
-
-    }
-    input_template = <<EOF
-
-{
-    "severity": <severity>,
-    "Finding_ID": <id>,
-    "eventFirstSeen": <first_seen>,
-    "eventLastSeen": <last_seen>,
-    "Finding_Type": <finding_type>,
-    "region": <region>,
-    "Finding_description": <description>
-}
-EOF
+  metric_transformation {
+    name      = "ConsoleSignInWithoutMfaCount"
+    namespace = "CloudTrailMetrics"
+    value     = "1"
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "console_sign_in_no_mfa" {
+  alarm_name                = "ConsoleSignInWithoutMfa"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "ConsoleSignInWithoutMfaCount"
+  namespace                 = "CloudTrailMetrics"
+  period                    = "300"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_description         = "This metric monitors console logins not protected by multi-factor authentication"
+  insufficient_data_actions = []
+  alarm_actions = aws_sns_topic.ops_topic.arn
+}
+

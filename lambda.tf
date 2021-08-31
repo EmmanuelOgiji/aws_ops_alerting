@@ -37,9 +37,17 @@ resource "aws_lambda_function" "alerting_lambda" {
 
   environment {
     variables = {
-      slack_webhook    = var.slack_webhook
-      teams_webhook    = var.teams_webhook
-      email_recipients = var.email_recipients
+      slack_webhook           = var.slack_webhook
+      teams_webhook           = var.teams_webhook
+      chime_webhook           = var.chime_webhook
+      enable_teams_output     = var.enable_teams_output
+      enable_chime_output     = var.enable_chime_output
+      enable_slack_output     = var.enable_chime_output
+      slack_channel_name      = var.slack_channel_name
+      slack_webhook_username  = var.slack_webhook_username
+      enable_ses_email_output = var.enable_ses_email_output
+      email_recipients        = var.email_recipients
+      ses_sender_email        = var.ses_sender_email
     }
   }
 }

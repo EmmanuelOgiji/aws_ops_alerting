@@ -25,6 +25,6 @@ resource "aws_cloudwatch_metric_alarm" "console_sign_in_no_mfa" {
   threshold                 = "1"
   alarm_description         = "This metric monitors console logins not protected by multi-factor authentication"
   insufficient_data_actions = []
-  alarm_actions             = aws_sns_topic.ops_topic.arn
+  alarm_actions             = [aws_sns_topic.ops_topic.arn]
 }
 

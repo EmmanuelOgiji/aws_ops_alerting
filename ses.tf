@@ -1,13 +1,18 @@
 resource "null_resource" "ses_verify_email" {
+  count = length(local.ses_emails)
   triggers = {
-    sender_email = var.ses_sender_email
+    sender           = var.ses_sender_email
+    email_recipients = var.email_recipients
   }
+
   provisioner "local-exec" {
     environment = {
-      AWS_DEFAULT_REGION   = var.region
-      AWS_ACCESS_KEY_ID    = var.access_key
-      AWS_SECRET_ACESS_KEY = var.secret_key
+      AWS_DEFAULT_REGION = var.region
     }
-    command = "aws ses verify-email-identity --email-address ${self.triggers.sender_email}"
+    command = "echo $(aws ses verify-email-identity --email-address ${local.ses_emails[count.index]})"
   }
+}
+
+locals {
+  ses_emails = concat([var.ses_sender_email], compact(split(",", var.email_recipients)))
 }

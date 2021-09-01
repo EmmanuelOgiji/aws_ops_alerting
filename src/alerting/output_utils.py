@@ -20,7 +20,7 @@ def publish_output(message):
 
 
 def publish_to_teams(message):
-    if os.environ.get("enable_teams_output") is True:
+    if os.environ.get("enable_teams_output") in [True, "True", "true"]:
         http = urllib3.PoolManager()
         url = os.environ.get("teams_webhook")
         payload = {
@@ -38,7 +38,7 @@ def publish_to_teams(message):
 
 
 def publish_to_chime(message):
-    if os.environ.get("enable_chime_output") is True:
+    if os.environ.get("enable_chime_output") in [True, "True", "true"]:
         http = urllib3.PoolManager()
         url = os.environ.get("chime_webhook")
         payload = {
@@ -56,7 +56,7 @@ def publish_to_chime(message):
 
 
 def publish_to_slack(message):
-    if os.environ.get("enable_slack_output") is True:
+    if os.environ.get("enable_slack_output") in [True, "True", "true"]:
         http = urllib3.PoolManager()
         url = os.environ.get("slack_webhook")
         channel_name = os.environ.get("slack_channel_name")
@@ -79,12 +79,12 @@ def publish_to_slack(message):
 
 
 def publish_to_ses(message):
-    if os.environ.get("enable_ses_email_output") is True:
+    if os.environ.get("enable_ses_email_output") in [True, "True", "true"]:
         sender = os.environ.get("ses_sender_email")
         recipients_str = os.environ.get("email_recipients")
         recipients = [entry.strip() for entry in recipients_str.split(',')]
 
-        subject = "Amazon SES Test (SDK for Python)"
+        subject = "Amazon SES Update from Account"
 
         client = boto3.client('ses')
 

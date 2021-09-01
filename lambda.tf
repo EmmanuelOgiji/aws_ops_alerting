@@ -74,12 +74,12 @@ resource "aws_lambda_function" "alerting_lambda" {
       slack_webhook           = var.slack_webhook
       teams_webhook           = var.teams_webhook
       chime_webhook           = var.chime_webhook
-      enable_teams_output     = var.enable_teams_output
-      enable_chime_output     = var.enable_chime_output
-      enable_slack_output     = var.enable_chime_output
+      enable_teams_output     = local.enable_teams_output
+      enable_chime_output     = local.enable_chime_output
+      enable_slack_output     = local.enable_slack_output
       slack_channel_name      = var.slack_channel_name
       slack_webhook_username  = var.slack_webhook_username
-      enable_ses_email_output = var.enable_ses_email_output
+      enable_ses_email_output = local.enable_ses_email_output
       email_recipients        = var.email_recipients
       ses_sender_email        = var.ses_sender_email
     }
@@ -92,4 +92,11 @@ resource "aws_lambda_permission" "with_sns" {
   function_name = aws_lambda_function.alerting_lambda.function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.ops_topic.arn
+}
+
+locals {
+  enable_ses_email_output = (var.ses_sender_email == "" || var.email_recipients == "") ? false : true
+  enable_slack_output     = (var.slack_channel_name == "" || var.slack_webhook_username == "" || var.slack_webhook == "") ? false : true
+  enable_teams_output     = var.teams_webhook == "" ? false : true
+  enable_chime_output     = var.chime_webhook == "" ? false : true
 }

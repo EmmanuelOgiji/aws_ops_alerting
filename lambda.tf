@@ -18,6 +18,40 @@ resource "aws_iam_role" "alerting_lambda_role" {
 EOF
 }
 
+resource "aws_iam_policy" "alerting_lambda_role" {
+  name        = "alerting_lambda_role_policy"
+  description = "IAM policy for logging from a lambda and sending SES email"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "ses:SendEmail"
+      ],
+      "Resource": "*",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "alerting_lambda_role" {
+  role       = aws_iam_role.alerting_lambda_role.name
+  policy_arn = aws_iam_policy.alerting_lambda_role.arn
+}
+
 data "archive_file" "alerting_lambda" {
   type        = "zip"
   source_dir  = "${path.module}/src/alerting"

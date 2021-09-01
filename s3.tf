@@ -1,5 +1,9 @@
+locals {
+  bucket_name = "${data.aws_caller_identity.current.account_id}-cloudtrail"
+}
+
 resource "aws_s3_bucket" "trail_bucket" {
-  bucket        = "${data.aws_caller_identity.current.account_id}-cloudtrail"
+  bucket        = local.bucket_name
   force_destroy = true
 
   policy = <<POLICY
@@ -13,7 +17,7 @@ resource "aws_s3_bucket" "trail_bucket" {
               "Service": "cloudtrail.amazonaws.com"
             },
             "Action": "s3:GetBucketAcl",
-            "Resource": "${data.aws_caller_identity.current.account_id}-cloudtrail"
+            "Resource": "arn:aws:s3:::${local.bucket_name}"
         },
         {
             "Sid": "AWSCloudTrailWrite",
@@ -22,7 +26,7 @@ resource "aws_s3_bucket" "trail_bucket" {
               "Service": "cloudtrail.amazonaws.com"
             },
             "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::${data.aws_caller_identity.current.account_id}-cloudtrail/prefix/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+            "Resource": "arn:aws:s3:::${local.bucket_name}/prefix/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
             "Condition": {
                 "StringEquals": {
                     "s3:x-amz-acl": "bucket-owner-full-control"
